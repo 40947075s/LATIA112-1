@@ -2,6 +2,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.rc("font", family="Microsoft JhengHei")
 
 # 讀取csv檔案
 data = pd.read_csv("graduatesc.csv")
