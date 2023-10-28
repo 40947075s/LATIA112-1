@@ -1,4 +1,5 @@
 # 載入套件
+from pickle import decode_long
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
@@ -37,7 +38,7 @@ plt.bar(
     total_graduates_by_study["日間_進修別"],
     total_graduates_by_study["畢業生總計"],
 )
-plt.title("各日間_進修別畢業生統計圖", fontsize=14)
+plt.title("各進修別畢業生統計圖", fontsize=14)
 plt.xlabel("日間_進修別", fontsize=14)
 plt.ylabel("畢業生總計", fontsize=14)
 
@@ -45,8 +46,10 @@ plt.ylabel("畢業生總計", fontsize=14)
 for i, value in enumerate(total_graduates_by_study["畢業生總計"]):
     plt.text(i, value, str(value), ha="center", va="bottom")
 
+plt.tight_layout()
+
 # 儲存與印出圖表
-plt.savefig("output/各日間_進修別畢業生統計圖.png")
+plt.savefig("output/各進修別畢業生統計圖.png")
 plt.show()
 plt.clf()
 
@@ -69,6 +72,8 @@ plt.ylabel("畢業生總計", fontsize=14)
 for i, value in enumerate(total_graduates_by_level["畢業生總計"]):
     plt.text(i, value, str(value), ha="center", va="bottom")
 
+plt.tight_layout()
+
 # 儲存與印出圖表
 plt.savefig("output/各等級別畢業生統計圖.png")
 plt.show()
@@ -83,7 +88,7 @@ female_graduates = data["上學年畢業生女"].sum()
 # 客製標籤
 def q4_labels(s, d):
     val = int(round(s / 100.0 * sum(d)))
-    return f"{s:.1f}%\n( {val}人 )"
+    return f"{s:.1f}%\n({val}人)"
 
 
 # 繪製圖表
@@ -97,6 +102,8 @@ plt.pie(
     explode=(0.1, 0),
 )
 plt.title("畢業生男女比例圓餅圖", fontsize=14)
+
+plt.tight_layout()
 
 # 儲存與印出圖表
 plt.savefig("output/畢業生男女比例圓餅圖.png")
@@ -139,6 +146,8 @@ for i, v in enumerate(graduates_by_study["上學年畢業生男"]):
 for i, v in enumerate(graduates_by_study["上學年畢業生女"]):
     plt.text(i + bar_width, v + 5, str(v), ha="center", va="bottom", fontsize=10)
 
+plt.tight_layout()
+
 # 儲存與印出圖表
 plt.savefig("output/各進修別男女畢業生人數統計圖.png")
 plt.show()
@@ -180,7 +189,193 @@ for i, v in enumerate(graduates_by_level["上學年畢業生男"]):
 for i, v in enumerate(graduates_by_level["上學年畢業生女"]):
     plt.text(i + bar_width, v + 5, str(v), ha="center", va="bottom", fontsize=10)
 
+plt.tight_layout()
+
 # 儲存與印出圖表
 plt.savefig("output/各等級別男女畢業生人數統計圖.png")
+plt.show()
+plt.clf()
+
+# -- Q7: 畢業人數前二十細學類統計圖 -- #
+# 統計各細學類畢業人數並排序
+graduates_by_category = data.groupby("細學類名稱")["畢業生總計"].sum().reset_index()
+graduates_by_category = graduates_by_category.sort_values(
+    by="畢業生總計",
+    ascending=False,
+)
+
+# 取前二十名
+q7_top20 = graduates_by_category.head(20)
+q7_top20 = q7_top20.sort_values(by="畢業生總計", ascending=True)
+
+# 繪製圖表
+plt.barh(
+    q7_top20["細學類名稱"],
+    q7_top20["畢業生總計"],
+    color="purple",
+)
+
+plt.title("畢業人數前二十細學類統計圖")
+plt.xlabel("畢業人數")
+plt.ylabel("細學類名稱")
+
+# 添加實際數值標籤
+for i, v in enumerate(q7_top20["畢業生總計"]):
+    plt.text(v, i, str(v), ha="left", va="center", fontsize=10)
+
+plt.tight_layout()
+
+# 儲存與印出圖表
+plt.savefig("output/畢業人數前二十細學類統計圖.png")
+plt.show()
+plt.clf()
+
+# -- Q8: 畢業男生人數前十細學類男女人數統計圖 -- #
+# 統計各細學類畢業男生人數並排序
+boy_graduates_by_category = (
+    data.groupby("細學類名稱")[["上學年畢業生男", "上學年畢業生女"]].sum().reset_index()
+)
+boy_graduates_by_category = boy_graduates_by_category.sort_values(
+    by="上學年畢業生男",
+    ascending=False,
+)
+
+# 取前十名
+boy_graduates_by_category = boy_graduates_by_category.head(10)
+boy_graduates_by_category = boy_graduates_by_category.sort_values(
+    by="上學年畢業生男",
+    ascending=True,
+)
+
+# 設定直條寬度、y軸刻度、y軸標籤
+bar_width = 0.3
+y = range(len(boy_graduates_by_category))
+plt.yticks([i + bar_width / 2 for i in y], boy_graduates_by_category["細學類名稱"])
+
+# 繪製圖表
+plt.barh(
+    [i + bar_width for i in y],
+    boy_graduates_by_category["上學年畢業生男"],
+    label="男",
+    color="lightblue",
+    height=bar_width,
+)
+plt.barh(
+    y,
+    boy_graduates_by_category["上學年畢業生女"],
+    label="女",
+    color="lightpink",
+    height=bar_width,
+)
+
+plt.title("畢業男生人數前十細學類男女人數統計圖")
+plt.xlabel("畢業生人數")
+plt.ylabel("細學類名稱")
+plt.legend()
+
+# 添加實際數值標籤
+for i, v in enumerate(boy_graduates_by_category["上學年畢業生男"]):
+    plt.text(v, i + bar_width, str(v), ha="left", va="center", fontsize=10)
+
+for i, v in enumerate(boy_graduates_by_category["上學年畢業生女"]):
+    plt.text(v, i, str(v), ha="left", va="center", fontsize=10)
+
+plt.tight_layout()
+
+# 儲存與印出圖表
+plt.savefig("output/畢業男生人數前十細學類男女人數統計圖.png")
+plt.show()
+plt.clf()
+
+# -- Q9: 畢業女生人數前十細學類男女人數統計圖 -- #
+# 統計各細學類畢業女生人數並排序
+boy_graduates_by_category = (
+    data.groupby("細學類名稱")[["上學年畢業生男", "上學年畢業生女"]].sum().reset_index()
+)
+boy_graduates_by_category = boy_graduates_by_category.sort_values(
+    by="上學年畢業生女",
+    ascending=False,
+)
+
+# 取前十名
+boy_graduates_by_category = boy_graduates_by_category.head(10)
+boy_graduates_by_category = boy_graduates_by_category.sort_values(
+    by="上學年畢業生女",
+    ascending=True,
+)
+
+# 設定直條寬度、y軸刻度、y軸標籤
+bar_width = 0.3
+y = range(len(boy_graduates_by_category))
+plt.yticks([i + bar_width / 2 for i in y], boy_graduates_by_category["細學類名稱"])
+
+# 繪製圖表
+plt.barh(
+    [i + bar_width for i in y],
+    boy_graduates_by_category["上學年畢業生女"],
+    label="女",
+    color="lightpink",
+    height=bar_width,
+)
+plt.barh(
+    y,
+    boy_graduates_by_category["上學年畢業生男"],
+    label="男",
+    color="lightblue",
+    height=bar_width,
+)
+
+plt.title("畢業女生人數前十細學類男女人數統計圖")
+plt.xlabel("畢業生人數")
+plt.ylabel("細學類名稱")
+plt.legend()
+
+# 添加實際數值標籤
+for i, v in enumerate(boy_graduates_by_category["上學年畢業生女"]):
+    plt.text(v, i + bar_width, str(v), ha="left", va="center", fontsize=10)
+
+for i, v in enumerate(boy_graduates_by_category["上學年畢業生男"]):
+    plt.text(v, i, str(v), ha="left", va="center", fontsize=10)
+
+plt.tight_layout()
+
+# 儲存與印出圖表
+plt.savefig("output/畢業女生人數前十細學類男女人數統計圖.png")
+plt.show()
+plt.clf()
+
+# -- Q10: 畢業人數前十細學類比例圖 -- #
+graduates_by_category = graduates_by_category.sort_values(
+    by="畢業生總計",
+    ascending=False,
+)
+
+# 取前十名與計算其他總和
+q10_top10 = graduates_by_category.head(10)
+q10_others = pd.DataFrame(
+    {
+        "細學類名稱": ["其他"],
+        "畢業生總計": [graduates_by_category["畢業生總計"][10:].sum()],
+    }
+)
+
+q10_top10 = pd.concat([q10_top10, q10_others])
+
+# 繪製圖表
+plt.pie(
+    q10_top10["畢業生總計"],
+    autopct=lambda i: q4_labels(i, q10_top10["畢業生總計"]),
+    labels=q10_top10["細學類名稱"],
+    startangle=90,
+    explode=(0.1, 0.1, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0),
+    pctdistance=0.85,
+    textprops={"fontsize": 9},
+)
+plt.title("畢業人數前十細學類比例圖", fontsize=14)
+
+plt.tight_layout()
+
+# 儲存與印出圖表
+plt.savefig("output/畢業人數前十細學類比例圖.png")
 plt.show()
 plt.clf()
