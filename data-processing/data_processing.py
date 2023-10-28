@@ -48,6 +48,7 @@ for i, value in enumerate(total_graduates_by_study["畢業生總計"]):
 # 儲存與印出圖表
 plt.savefig("output/各日間_進修別畢業生統計圖.png")
 plt.show()
+plt.clf()
 
 # -- Q3: 各等級別畢業生統計圖 -- #
 # 計算畢業生總計
@@ -71,6 +72,7 @@ for i, value in enumerate(total_graduates_by_level["畢業生總計"]):
 # 儲存與印出圖表
 plt.savefig("output/各等級別畢業生統計圖.png")
 plt.show()
+plt.clf()
 
 # -- Q4: 畢業生男女比例圓餅圖 -- #
 # 計算男女畢業生總數
@@ -99,13 +101,14 @@ plt.title("畢業生男女比例圓餅圖", fontsize=14)
 # 儲存與印出圖表
 plt.savefig("output/畢業生男女比例圓餅圖.png")
 plt.show()
+plt.clf()
 
 # -- Q5: 各進修別男女畢業生人數統計圖 -- #
 # 計算各進修別畢業生男女人數
 graduates_by_study = data.groupby("日間_進修別")[["上學年畢業生男", "上學年畢業生女"]].sum().reset_index()
 
 # 設定直條寬度、x軸刻度、x軸標籤
-bar_width = 0.35
+bar_width = 0.45
 x = range(len(graduates_by_study))
 plt.xticks([i + bar_width / 2 for i in x], graduates_by_study["日間_進修別"])
 
@@ -139,13 +142,14 @@ for i, v in enumerate(graduates_by_study["上學年畢業生女"]):
 # 儲存與印出圖表
 plt.savefig("output/各進修別男女畢業生人數統計圖.png")
 plt.show()
+plt.clf()
 
 # -- Q6: 各等級別男女畢業生人數統計圖 -- #
 # 計算各等級別畢業生男女人數
 graduates_by_level = data.groupby("等級別")[["上學年畢業生男", "上學年畢業生女"]].sum().reset_index()
 
 # 設定直條寬度、x軸刻度、x軸標籤
-bar_width = 0.4
+bar_width = 0.45
 x = range(len(graduates_by_level))
 plt.xticks([i + bar_width / 2 for i in x], graduates_by_level["等級別"])
 
@@ -179,3 +183,4 @@ for i, v in enumerate(graduates_by_level["上學年畢業生女"]):
 # 儲存與印出圖表
 plt.savefig("output/各等級別男女畢業生人數統計圖.png")
 plt.show()
+plt.clf()
