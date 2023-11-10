@@ -1,3 +1,4 @@
+# 載入套件
 import scrapy
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -25,10 +26,12 @@ class MoeStatsSpiderSpider(scrapy.Spider):
         self.driver = webdriver.Chrome(options=chrome_options)
         self.driver.get("https://stats.moe.gov.tw/bcode/")
 
+        # 設置等待時間與爬取最大頁數（爲測試方便預設爲100）
         self.wait_time = 5
         self.max_data_page = 100
 
     def parse(self, response):
+        # 設定搜尋條件並按下搜尋鍵
         self.setup_search_criteria()
         self.driver.find_element(By.ID, "Button1").click()
 
@@ -37,6 +40,7 @@ class MoeStatsSpiderSpider(scrapy.Spider):
             EC.presence_of_element_located((By.ID, "GridView1"))
         )
 
+        # 使用bs4抓取html資料
         soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
         # 取得表格標頭
@@ -47,6 +51,7 @@ class MoeStatsSpiderSpider(scrapy.Spider):
 
         # 將資料寫入CSV檔案
         with open("output.csv", "w", newline="", encoding="utf-8") as csvfile:
+            # 寫入標頭
             csv_writer = csv.DictWriter(csvfile, fieldnames=headers)
             csv_writer.writeheader()
 
@@ -58,11 +63,12 @@ class MoeStatsSpiderSpider(scrapy.Spider):
                     row_data = dict(zip(headers, values))
                     csv_writer.writerow(row_data)
 
-                # 檢查是否有下一頁
+                # 檢查是否有下一頁按鈕，若無，結束爬取，若有，則抓取資料
                 next_page_button = self.driver.find_element(By.ID, "BtnNext")
                 if next_page_button.get_attribute("disabled"):
                     break
                 else:
+                    # 點擊下一頁，等待0.5秒以避免網頁癱瘓
                     next_page_button.click()
                     sleep(0.5)
 
@@ -73,11 +79,14 @@ class MoeStatsSpiderSpider(scrapy.Spider):
                     soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
     def setup_search_criteria(self):
+        # 點擊radio_button
         self.click_radio_button("RadioButtonList2_3")
 
+        # 填寫text_field
         self.fill_text_field("minYear", "100")
         self.fill_text_field("maxYear", "110")
 
+        # 設定checkbox
         checkbox_data = {
             "CheckBoxList1_0": True,
             "CheckBoxList1_1": False,
@@ -99,6 +108,7 @@ class MoeStatsSpiderSpider(scrapy.Spider):
         for id, is_checked in checkbox_data.items():
             self.set_checkbox_state(id, is_checked)
 
+        # 選取dropdown list
         self.set_dropdown_value("DropDownList1", "06")
         self.set_dropdown_value("DropDownList2", "-1")
         self.set_dropdown_value("DropDownList3", "-1")
@@ -140,6 +150,7 @@ class MoeStatsSpiderSpider(scrapy.Spider):
             select.select_by_value(value)
 
         except NoSuchElementException:
+            # 例外處理找不到指定value的狀況
             self.logger.error(
                 f"Value {value} not found in dropdown with ID {dropdown_id}"
             )
