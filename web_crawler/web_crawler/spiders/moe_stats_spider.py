@@ -1,13 +1,13 @@
 import scrapy
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 from selenium.common.exceptions import NoSuchElementException
-from time import sleep
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from time import sleep
 import csv
 
 
@@ -37,7 +37,6 @@ class MoeStatsSpiderSpider(scrapy.Spider):
             EC.presence_of_element_located((By.ID, "GridView1"))
         )
 
-        # 使用BeautifulSoup來解析HTML
         soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
         # 取得表格標頭
@@ -67,12 +66,10 @@ class MoeStatsSpiderSpider(scrapy.Spider):
                     next_page_button.click()
                     sleep(0.5)
 
-                    # 等待數據加載完成
+                    # 等待數據加載完成並取得HTML內容
                     WebDriverWait(self.driver, self.wait_time).until(
                         EC.staleness_of(next_page_button)
                     )
-
-                    # 使用BeautifulSoup來解析HTML
                     soup = BeautifulSoup(self.driver.page_source, "html.parser")
 
     def setup_search_criteria(self):
@@ -149,5 +146,4 @@ class MoeStatsSpiderSpider(scrapy.Spider):
 
     def closed(self, reason):
         # 確保在爬蟲結束後正確關閉Selenium WebDriver
-        pass
-        # self.driver.quit()
+        self.driver.quit()
