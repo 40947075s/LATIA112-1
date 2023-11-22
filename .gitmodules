@@ -1,3 +1,6 @@
 [submodule "final_project/Scrapy-TopUniversity"]
 	path = final_project/Scrapy-TopUniversity
 	url = https://github.com/40947075s/Scrapy-TopUniversity.git
+[submodule "final_project/Arxiv-Data"]
+	path = final_project/Arxiv-Data
+	url = 40947075s:LATIA112-1-Finial-Project/Arxiv-Data.git
