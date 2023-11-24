@@ -2,8 +2,8 @@ import sys
 import configparser
 
 # Azure Text analytics
-from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
+from azure.ai.textanalytics import TextAnalyticsClient
 
 from flask import Flask, request, abort
 from linebot.v3 import WebhookHandler
@@ -23,6 +23,9 @@ from linebot.v3.messaging import (
 # Config Parser
 config = configparser.ConfigParser()
 config.read("config.ini")
+
+# Config Azure Analytics
+credential = AzureKeyCredential(config["AzureLanguage"]["API_KEY"])
 
 app = Flask(__name__)
 
@@ -58,14 +61,56 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def message_text(event):
+    sentiment_result = azure_sentiment(event.message.text)
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)],
+                messages=[TextMessage(text=sentiment_result)],
             )
         )
+
+
+def azure_sentiment(user_input):
+    text_analytics_client = TextAnalyticsClient(
+        endpoint=config["AzureLanguage"]["END_POINT"], credential=credential
+    )
+    documents = [user_input]
+    response = text_analytics_client.analyze_sentiment(
+        documents, show_opinion_mining=True, language="zh-Hant"
+    )
+
+    # -- Parse response --#
+    analyze_result = response[0]
+
+    if analyze_result.is_error:
+        return "Analyzing sentiment failed."
+
+    # parse sentiment
+    sentiment_mapping = {"positive": "正向", "neutral": "中立", "negative": "負向"}
+
+    sentiment = getattr(analyze_result, "sentiment")
+    sentiment = sentiment_mapping.get(sentiment, "未知")
+
+    # get confidence scores
+    confidence_scores = getattr(analyze_result, "confidence_scores")
+
+    # get target
+    try:
+        target = response[0].sentences[0].mined_opinions[0].target.text
+    except (AttributeError, IndexError):
+        target = None
+
+    # create result message
+    message = f"情感目標： {target}\n"
+    message += f"情感評估： {sentiment}\n"
+    message += f"情感分數：\n"
+    message += f"\t正向：{confidence_scores.positive}\n"
+    message += f"\t中性：{confidence_scores.neutral}\n"
+    message += f"\t負向：{confidence_scores.negative}"
+
+    return message
 
 
 if __name__ == "__main__":
