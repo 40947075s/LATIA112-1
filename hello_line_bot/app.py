@@ -81,7 +81,7 @@ def azure_sentiment(user_input):
         documents, show_opinion_mining=True, language="zh-Hant"
     )
 
-    # -- Parse response --#
+    # -- Parse response -- #
     analyze_result = response[0]
 
     if analyze_result.is_error:
@@ -102,7 +102,7 @@ def azure_sentiment(user_input):
     except (AttributeError, IndexError):
         target = None
 
-    # create result message
+    # -- Create result message -- #
     message = f"情感目標： {target}\n"
     message += f"情感評估： {sentiment}\n"
     message += f"情感分數：\n"
