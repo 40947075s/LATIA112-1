@@ -1,9 +1,9 @@
 function preprocessCsvData(data) {
   data.forEach((row) => {
-    // Replace all '年' with ''
-    if (row["學年度別"]) {
-      row["學年度別"] = row["學年度別"].replace(/年/g, "");
-    }
+    // // Replace all '年' with ''
+    // if (row["學年度別"]) {
+    //   row["學年度別"] = row["學年度別"].replace(/年/g, "");
+    // }
 
     // Replace all '-' with 0
     for (const key in row) {
@@ -16,11 +16,47 @@ function preprocessCsvData(data) {
   return data;
 }
 
+function createLineChart(data) {
+  const categories = [...new Set(data.map((row) => row["學制別"]))];
+
+  // Create traces
+  const traces = [];
+  categories.forEach((category) => {
+    const categoryData = data.filter((row) => row["學制別"] === category);
+    const years = categoryData.map((row) => row["學年度別"]);
+    const totals = categoryData.map((row) => parseInt(row["總計"]));
+
+    const trace = {
+      x: years,
+      y: totals,
+      type: "scatter",
+      mode: "lines+markers+text",
+      text: totals,
+      testposition: "bottom center",
+
+      name: `${category}`,
+    };
+
+    traces.push(trace);
+  });
+
+  const layout = {
+    title: "各學年度畢業生人數統計",
+    xaxis: {
+      title: "學年度",
+    },
+    yaxis: {
+      title: "畢業生人數",
+    },
+  };
+
+  Plotly.newPlot("line-chart", traces, layout);
+}
+
 d3.csv("Graduate_Outcomes_of_Taipei_City_Secondary_Schools.csv")
   .then((data) => {
     data = preprocessCsvData(data);
-
-    console.log(data);
+    createLineChart(data);
   })
   .catch((error) => console.error("Error fetching or parsing CSV:", error));
 
