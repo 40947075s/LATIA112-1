@@ -18,4 +18,4 @@
 
 - 作業三：[Sentiment Analysis Line Bot](hello_line_bot)
 
-- 作業四：[PlotlyJS](hello_plotly)
+- 作業四：[PlotlyJS](docs/plotlyJS)
