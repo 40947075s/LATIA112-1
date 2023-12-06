@@ -10,6 +10,6 @@
 
 4. 網頁上要有資料與圖表說明
 
-> 註：[網頁連結]("https://40947075s.github.io/LATIA112-1/plotlyJS/index.html")
+> 註：[網頁連結](https://40947075s.github.io/LATIA112-1/plotlyJS/index.html)
 
 > 註：[資料集來源](https://data.gov.tw/dataset/131261)
