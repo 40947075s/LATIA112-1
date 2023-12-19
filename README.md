@@ -19,3 +19,13 @@
 - 作業三：[Sentiment Analysis Line Bot](hello_line_bot)
 
 - 作業四：[PlotlyJS](docs/plotlyJS)
+
+- Final Project：[Project Page](https://github.com/LATIA112-1-Finial-Project)
+
+  - [Frontend](https://github.com/LATIA112-1-Finial-Project/FP-Frontend.git)
+ 
+  - [Backend](https://github.com/LATIA112-1-Finial-Project/FP-Backend.git)
+ 
+  - [Scrapy-TopUniversity](https://github.com/LATIA112-1-Finial-Project/Scrapy-TopUniversity.git)
+ 
+  - [Selenium-Arxiv](https://github.com/LATIA112-1-Finial-Project/Arxiv-Data.git)
